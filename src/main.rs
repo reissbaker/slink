@@ -8,22 +8,24 @@ enum Slink {
     #[structopt(name = "go", about = "SSH to the remote")]
     Go {
     },
+
     #[structopt(name = "run", about = "Run a command on the remote")]
     Run {
         #[structopt(help = "Command to run on the remote machine")]
         command: String,
     },
+
     #[structopt(name = "up", about = "Sync directory up to the remote machine")]
     Up {
     },
+
     #[structopt(name = "down", about = "Sync directory down from the remote machine")]
     Down {
     },
 }
 
 fn main() {
-    let opt = Slink::from_args();
-    match opt {
+    match Slink::from_args() {
         Slink::Go { } => go(),
         Slink::Run { command } => run(command),
         Slink::Up { } => up(),
