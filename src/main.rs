@@ -2,13 +2,14 @@
 extern crate structopt;
 
 mod cli;
+mod conn;
+mod errors;
 
-use std::io;
-use std::io::{Error, ErrorKind};
-use std::process::Command;
 use structopt::StructOpt;
 use std::path::PathBuf;
 use cli::{SlinkCommand, RsyncDirection};
+use conn::ssh_command;
+use errors::SlinkResult;
 
 fn main() {
     let result = match SlinkCommand::from_args() {
@@ -27,81 +28,43 @@ fn main() {
 
     match result {
         Ok(_) => {},
-        Err(e) => {
-            // TODO: panic for developers; exit nonzero for users
-            // TODO: invent your own error hierarchy rather than using
-            // io::Result, so that you can exit with meaningful exit codes
-            panic!("Error: {}", e);
-        },
+        Err(e) => errors::log_error_and_exit(e),
     };
 }
 
-fn use_host(host: String) -> io::Result<()> {
+fn use_host(host: String) -> SlinkResult<()> {
     println!("Using host: {}", host);
     Ok(())
 }
 
-fn go() -> io::Result<()> {
+fn go() -> SlinkResult<()> {
     println!("hello from go");
     ssh_command(|_| {})
 }
 
-fn run(command: String) -> io::Result<()> {
+fn run(command: String) -> SlinkResult<()> {
     println!("running: {}", command);
     ssh_command(|ssh| {
         ssh.arg(command);
     })
 }
 
-fn rsync_up() -> io::Result<()> {
+fn rsync_up() -> SlinkResult<()> {
     println!("hello from up");
     Ok(())
 }
 
-fn rsync_down() -> io::Result<()> {
+fn rsync_down() -> SlinkResult<()> {
     println!("hello from down");
     Ok(())
 }
 
-fn upload(path: PathBuf) -> io::Result<()> {
+fn upload(path: PathBuf) -> SlinkResult<()> {
     println!("uploading: {:?}", path);
     Ok(())
 }
 
-fn download(path: PathBuf) -> io::Result<()> {
+fn download(path: PathBuf) -> SlinkResult<()> {
     println!("downloading: {:?}", path);
     Ok(())
-}
-
-// Run an ssh command, passing the command as an argument to a closure for extra
-// configuration before running it
-fn ssh_command<F>(ssh_closure: F) -> io::Result<()>
-    where  F: FnOnce(&mut Command) -> ()
-{
-    let mut command = Command::new("ssh");
-    command.arg("shoebox");
-
-    // Allow configuration
-    ssh_closure(&mut command);
-
-    // Now that it's configured, run it
-    run_process(&mut command)
-}
-
-// Run a configured command as a child process, block until completion, and
-// handle errors
-fn run_process(command: &mut Command) -> io::Result<()> {
-    let mut child = try!(command.spawn());
-
-    let exit_status = try!(child.wait());
-    if exit_status.success() {
-        return Ok(());
-    }
-
-    let error = match exit_status.code() {
-        Some(code) => Error::new(ErrorKind::Other, format!("Process exited with exit code {}", code)),
-        None => Error::new(ErrorKind::Interrupted, "Process was killed by signal"),
-    };
-
-    Err(error)
 }
