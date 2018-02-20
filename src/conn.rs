@@ -8,9 +8,13 @@ pub enum ProcessError<'a> {
     KilledBySignal(&'a str),
 }
 
+// SSH errors are all static strings; make it easier for consumers to use these
+// values by setting them to have the static lifetime
+pub type SshError = ProcessError<'static>;
+
 // Run an ssh command, passing the command as an argument to a closure for extra
 // configuration before running it
-pub fn ssh_command<'a, F>(ssh_closure: F) -> SlinkResult<'a, ()>
+pub fn ssh_command<F>(ssh_closure: F) -> SlinkResult<()>
     where  F: FnOnce(&mut Command) -> ()
 {
     run_process("ssh", |cmd| {
