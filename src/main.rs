@@ -73,6 +73,8 @@ fn download(path: PathBuf) -> io::Result<()> {
     Ok(())
 }
 
+// Run an ssh command, passing the command as an argument to a closure for extra
+// configuration before running it
 fn ssh_command<F>(ssh_closure: F) -> io::Result<()>
     where  F: FnOnce(&mut Command) -> ()
 {
@@ -81,19 +83,22 @@ fn ssh_command<F>(ssh_closure: F) -> io::Result<()>
 
     // Allow configuration
     ssh_closure(&mut command);
+    run_process(&mut command)
+}
 
-    // Run and handle errors
-    let mut child = try!(
-        command.spawn()
-    );
+// Run a configured command as a child process, block until completion, and
+// handle errors
+fn run_process(command: &mut Command) -> io::Result<()> {
+    let mut child = try!(command.spawn());
+
     let exit_status = try!(child.wait());
     if exit_status.success() {
         return Ok(());
     }
 
     let error = match exit_status.code() {
-        Some(code) => Error::new(ErrorKind::Other, format!("SSH exited with exit code {}", code)),
-        None => Error::new(ErrorKind::Interrupted, "SSH was killed by signal"),
+        Some(code) => Error::new(ErrorKind::Other, format!("Process exited with exit code {}", code)),
+        None => Error::new(ErrorKind::Interrupted, "Process was killed by signal"),
     };
 
     Err(error)
