@@ -1,7 +1,7 @@
 use conn::ProcessError;
 
-pub type SlinkResult<T> = Result<T, SlinkError>;
-pub type SlinkError = ProcessError;
+pub type SlinkResult<'a, T> = Result<T, SlinkError<'a>>;
+pub type SlinkError<'a> = ProcessError<'a>;
 
 pub fn log_error_and_exit(err: SlinkError) {
     println!("Slink encountered a fatal error:");

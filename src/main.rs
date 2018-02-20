@@ -32,39 +32,39 @@ fn main() {
     };
 }
 
-fn use_host(host: String) -> SlinkResult<()> {
+fn use_host<'a>(host: String) -> SlinkResult<'a, ()> {
     println!("Using host: {}", host);
     Ok(())
 }
 
-fn go() -> SlinkResult<()> {
+fn go<'a>() -> SlinkResult<'a, ()> {
     println!("hello from go");
     ssh_command(|_| {})
 }
 
-fn run(command: String) -> SlinkResult<()> {
+fn run<'a>(command: String) -> SlinkResult<'a, ()> {
     println!("running: {}", command);
     ssh_command(|ssh| {
         ssh.arg(command);
     })
 }
 
-fn rsync_up() -> SlinkResult<()> {
+fn rsync_up<'a>() -> SlinkResult<'a, ()> {
     println!("hello from up");
     Ok(())
 }
 
-fn rsync_down() -> SlinkResult<()> {
+fn rsync_down<'a>() -> SlinkResult<'a, ()> {
     println!("hello from down");
     Ok(())
 }
 
-fn upload(path: PathBuf) -> SlinkResult<()> {
+fn upload<'a>(path: PathBuf) -> SlinkResult<'a, ()> {
     println!("uploading: {:?}", path);
     Ok(())
 }
 
-fn download(path: PathBuf) -> SlinkResult<()> {
+fn download<'a>(path: PathBuf) -> SlinkResult<'a, ()> {
     println!("downloading: {:?}", path);
     Ok(())
 }

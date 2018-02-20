@@ -1,26 +1,27 @@
 use std::process::Command;
 use errors::SlinkResult;
 
-pub enum ProcessError {
-    FailedToLaunch(&'static str),
-    FailedToWait(&'static str),
-    NonZeroExit(&'static str, i32),
-    KilledBySignal(&'static str),
+pub enum ProcessError<'a> {
+    FailedToLaunch(&'a str),
+    FailedToWait(&'a str),
+    NonZeroExit(&'a str, i32),
+    KilledBySignal(&'a str),
 }
 
 // Run an ssh command, passing the command as an argument to a closure for extra
 // configuration before running it
-pub fn ssh_command<F>(ssh_closure: F) -> SlinkResult<()>
+pub fn ssh_command<'a, F>(ssh_closure: F) -> SlinkResult<'a, ()>
     where  F: FnOnce(&mut Command) -> ()
 {
     run_process("ssh", |cmd| {
+        cmd.arg("shoebox");
         ssh_closure(cmd);
     })
 }
 
 // Run a configured command as a child process, block until completion, and
 // handle errors
-fn run_process<F>(cmd_str: &'static str, cmd_closure: F) -> Result<(), ProcessError>
+fn run_process<'a, F>(cmd_str: &'a str, cmd_closure: F) -> Result<(), ProcessError<'a>>
     where F: FnOnce(&mut Command) -> ()
 {
     // Build command and configure
