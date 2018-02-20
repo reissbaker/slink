@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 #[derive(StructOpt, Debug)]
 #[structopt(name = "slink", about = "Interact with remote machines over SSH")]
-pub enum Slink {
+pub enum SlinkCommand {
     #[structopt(name = "use", about = "Update which remote machine slink uses")]
     Use {
         #[structopt(help = "The hostname of the remote machine")]
