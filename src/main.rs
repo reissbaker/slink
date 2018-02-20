@@ -83,6 +83,8 @@ fn ssh_command<F>(ssh_closure: F) -> io::Result<()>
 
     // Allow configuration
     ssh_closure(&mut command);
+
+    // Now that it's configured, run it
     run_process(&mut command)
 }
 
