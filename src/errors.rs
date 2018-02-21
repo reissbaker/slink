@@ -1,7 +1,8 @@
-use conn::{ProcessError, SshError};
+use conn;
+use process;
 
 pub type SlinkResult<T> = Result<T, SlinkError>;
-pub type SlinkError = SshError;
+pub type SlinkError = conn::Error;
 
 pub fn log_error_and_exit(err: SlinkError) {
     println!("Slink encountered a fatal error:");
@@ -10,22 +11,22 @@ pub fn log_error_and_exit(err: SlinkError) {
     // don't forget to have an exit (rather than trying to remember to always
     // call exit() in the match arms).
     let exit = match err {
-        ProcessError::FailedToLaunch(name) => {
+        process::Error::FailedToLaunch(name) => {
             println!("Failed to launch {}", name);
             2
         },
 
-        ProcessError::FailedToWait(name) => {
+        process::Error::FailedToWait(name) => {
             println!("Couldn't wait for {}", name);
             3
         },
 
-        ProcessError::NonZeroExit(name, code) => {
+        process::Error::NonZeroExit(name, code) => {
             println!("{} exited with code {}", name, code);
             4
         },
 
-        ProcessError::KilledBySignal(name) => {
+        process::Error::KilledBySignal(name) => {
             println!("{} killed by signal", name);
             5
         },

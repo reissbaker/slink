@@ -4,6 +4,7 @@ extern crate structopt;
 mod cli;
 mod conn;
 mod errors;
+mod process;
 
 use structopt::StructOpt;
 use std::path::PathBuf;
