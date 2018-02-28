@@ -39,12 +39,11 @@ fn use_host(host: String) -> SlinkResult<()> {
 }
 
 fn go() -> SlinkResult<()> {
-    println!("hello from go");
     ssh_command(|_| {})
 }
 
 fn run(command: String) -> SlinkResult<()> {
-    println!("running: {}", command);
+    println!("Running {:?} on the remote machine", command);
     ssh_command(|ssh| {
         ssh.arg(command);
     })
