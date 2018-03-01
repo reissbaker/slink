@@ -73,7 +73,7 @@ fn exec_command_in(path: &str, command: &str) -> String {
 
     // Escape the echo message separately, since otherwise you'd need to encase
     // in quotes (which would break shell escaping)
-    let echo_string = format!("Running in directory: {}", path);
+    let echo_string = format!("Running in remote directory: {}", path);
     let escaped_echo = shell_escape::escape(Cow::Borrowed(echo_string.as_str()));
 
     format!(
