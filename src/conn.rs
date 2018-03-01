@@ -5,6 +5,7 @@ use std::fs::File;
 use std::io::Write;
 use std::io::Read;
 use xdg;
+use isatty;
 use process;
 use errors::SlinkResult;
 
@@ -97,11 +98,15 @@ fn ssh_command_with_host<F>(host: &str, sock_str: &str, ssh_closure: F) -> Slink
            // Use the passed-in socket string for the controlmaster path
            .arg(format!("-oControlPath={}", sock_str))
            // Hang onto the shared connection for 10mins after exit
-           .arg("-oControlPersist=10m")
-           // Force PTY allocation for interactivity
-           .arg("-t")
-           // Run in quiet mode
-           .arg("-q")
+           .arg("-oControlPersist=10m");
+
+        // Force PTY allocation for interactivity if stdout is a tty
+        if isatty::stdout_isatty() {
+           cmd.arg("-t");
+        }
+
+        // Run in quiet mode
+        cmd.arg("-q")
            // And finally, SSH to the given host
            .arg(host);
 
