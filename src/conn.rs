@@ -95,6 +95,7 @@ fn ssh_command_with_host<F>(host: &str, sock_str: &str, ssh_closure: F) -> Slink
         cmd.arg("-oControlMaster=auto")
            .arg(format!("-oControlPath={}", sock_str))
            .arg("-oControlPersist=10m")
+           .arg("-t")
            .arg(host);
         ssh_closure(cmd);
     });
