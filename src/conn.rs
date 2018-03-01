@@ -100,6 +100,8 @@ fn ssh_command_with_host<F>(host: &str, sock_str: &str, ssh_closure: F) -> Slink
            .arg("-oControlPersist=10m")
            // Force PTY allocation for interactivity
            .arg("-t")
+           // Run in quiet mode
+           .arg("-q")
            // And finally, SSH to the given host
            .arg(host);
 
