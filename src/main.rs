@@ -43,7 +43,6 @@ fn go() -> SlinkResult<()> {
 }
 
 fn run(command: String) -> SlinkResult<()> {
-    println!("Running {:?} on the remote machine", command);
     conn::ssh_command(|ssh| {
         ssh.arg(command);
     })
