@@ -30,7 +30,7 @@ pub fn ssh_command<F>(ssh_closure: F) -> SlinkResult<()>
     where  F: FnOnce(&mut Command) -> ()
 {
     let dirs = xdg_dirs().unwrap();
-    let sock_path = dirs.place_data_file("conn.sock")
+    let sock_path = dirs.place_cache_file("conn.sock")
                         .expect("Could not create persistent socket file");
 
     let sock_str = sock_path.to_str().unwrap();
