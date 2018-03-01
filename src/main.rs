@@ -1,5 +1,6 @@
 #[macro_use]
 extern crate structopt;
+extern crate xdg;
 
 mod cli;
 mod conn;
@@ -9,7 +10,6 @@ mod process;
 use structopt::StructOpt;
 use std::path::PathBuf;
 use cli::{SlinkCommand, RsyncDirection};
-use conn::ssh_command;
 use errors::SlinkResult;
 
 fn main() {
@@ -35,16 +35,16 @@ fn main() {
 
 fn use_host(host: String) -> SlinkResult<()> {
     println!("Using host: {}", host);
-    Ok(())
+    conn::set_host(host.as_str())
 }
 
 fn go() -> SlinkResult<()> {
-    ssh_command(|_| {})
+    conn::ssh_command(|_| {})
 }
 
 fn run(command: String) -> SlinkResult<()> {
     println!("Running {:?} on the remote machine", command);
-    ssh_command(|ssh| {
+    conn::ssh_command(|ssh| {
         ssh.arg(command);
     })
 }

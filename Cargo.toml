@@ -7,3 +7,4 @@ authors = ["Matt Baker <matthew.reiss.baker@gmail.com>"]
 serde = "1.0"
 serde_yaml = "0.7"
 structopt = "0.2"
+xdg = "^2.1"
