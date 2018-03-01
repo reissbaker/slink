@@ -10,7 +10,6 @@ use errors::SlinkResult;
 
 const HOST_CONFIG_FILE: &'static str = "hostname";
 
-
 pub enum Error {
     NoConfigFile,
     FailedConfigWrite(io::Error),
