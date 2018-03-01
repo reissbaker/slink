@@ -92,11 +92,19 @@ fn ssh_command_with_host<F>(host: &str, sock_str: &str, ssh_closure: F) -> Slink
     where  F: FnOnce(&mut Command) -> ()
 {
     let proc_result = process::run("ssh", |cmd| {
+        // "auto" ControlMaster setting means create a new connection if none
+        // exists, and use the existing one if available
         cmd.arg("-oControlMaster=auto")
+           // Use the passed-in socket string for the controlmaster path
            .arg(format!("-oControlPath={}", sock_str))
+           // Hang onto the shared connection for 10mins after exit
            .arg("-oControlPersist=10m")
+           // Force PTY allocation for interactivity
            .arg("-t")
+           // And finally, SSH to the given host
            .arg(host);
+
+        // Allow further configuration via the passed-in closure
         ssh_closure(cmd);
     });
 
