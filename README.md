@@ -1,7 +1,7 @@
 ## Slink: simple remote development environments
 
 ```bash
-slink use devbox.reissbaker.net
+slink use remote-devbox.mydomain.com
 
 # sync the current directory to the remote machine:
 slink sync up
