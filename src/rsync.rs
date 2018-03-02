@@ -11,6 +11,9 @@ pub fn up(to: PathBuf) -> SlinkResult<()> {
     };
 
     rsync(host.as_str(), |cmd| {
+        // Delete extraneous files
+        cmd.arg("--delete");
+
         // Use the current directory
         cmd.arg(".");
 
