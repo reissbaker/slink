@@ -9,13 +9,14 @@ mod cli;
 mod conn;
 mod errors;
 mod process;
+mod paths;
 
 use structopt::StructOpt;
-use std::env;
 use std::path::PathBuf;
 use std::borrow::Cow;
 use cli::{SlinkCommand, RsyncDirection};
 use errors::SlinkResult;
+use paths::{relative_pwd, pwd_or_panic};
 
 fn main() {
     let result = match SlinkCommand::from_args() {
@@ -30,6 +31,7 @@ fn main() {
         },
         SlinkCommand::Upload { path } => upload(path),
         SlinkCommand::Download { path } => download(path),
+        SlinkCommand::Current => current(),
     };
 
     match result {
@@ -43,6 +45,16 @@ fn use_host(host: String) -> SlinkResult<()> {
     conn::set_host(host.as_str())
 }
 
+fn current() -> SlinkResult<()> {
+    match conn::get_host() {
+        Err(e) => Err(e),
+        Ok(host) => {
+            println!("{}", host);
+            Ok(())
+        },
+    }
+}
+
 fn go() -> SlinkResult<()> {
     conn::ssh_command(|ssh| {
         ssh.arg(exec_shell_in_same_path());
@@ -50,19 +62,19 @@ fn go() -> SlinkResult<()> {
 }
 
 fn exec_command_in_same_path(command: &str) -> String {
-    let home_dir = env::home_dir().unwrap();
-    let pwd = env::current_dir().unwrap();
-    match pathdiff::diff_paths(&pwd, &home_dir) {
+    match relative_pwd() {
         Some(relative_path) => {
             let rel_str = relative_path.to_str().unwrap();
             exec_command_in(rel_str, command)
         },
         None => {
+            let pwd = pwd_or_panic();
             let pwd_str = pwd.to_str().unwrap();
             exec_command_in(pwd_str, command)
         }
     }
 }
+
 
 fn exec_shell_in_same_path() -> String {
     exec_command_in_same_path("$SHELL --login")
@@ -79,6 +91,7 @@ fn exec_command_in(path: &str, command: &str) -> String {
     format!(
         "test -d {} {} && cd {} ; exec {}",
         escaped,
+        // Log a UI message about the directory assuming stdout is a tty
         if isatty::stdout_isatty() {
             format!("&& echo {}", escaped_echo)
         } else {

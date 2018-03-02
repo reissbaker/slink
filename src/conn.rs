@@ -1,6 +1,5 @@
 use std::io;
 use std::process::Command;
-use std::path::PathBuf;
 use std::fs::File;
 use std::io::Write;
 use std::io::Read;
@@ -30,18 +29,11 @@ pub enum Error {
 pub fn ssh_command<F>(ssh_closure: F) -> SlinkResult<()>
     where  F: FnOnce(&mut Command) -> ()
 {
-    let dirs = xdg_dirs().unwrap();
-    let sock_path = dirs.place_cache_file("conn.sock")
-                        .expect("Could not create persistent socket file");
-
-    let sock_str = sock_path.to_str().unwrap();
-    let host_path = dirs.find_config_file(HOST_CONFIG_FILE);
-
-    match host_path {
-        Some(path) => ssh_command_with_host_path(path, sock_str, ssh_closure),
-        None => Err(Error::NoConfigFile),
+    let host_result = get_host();
+    match host_result {
+        Err(e) => Err(e),
+        Ok(host) => ssh_command_with_host(host.as_str(), ssh_closure),
     }
-
 }
 
 /*
@@ -65,32 +57,46 @@ pub fn set_host(host: &str) -> SlinkResult<()> {
     }
 }
 
+/*
+ * Get the host used for SSH connections.
+ */
+pub fn get_host() -> SlinkResult<String> {
+    let dirs = xdg_dirs().unwrap();
+    let host_path = dirs.find_config_file(HOST_CONFIG_FILE);
+
+    match host_path {
+        None => Err(Error::NoConfigFile),
+        Some(path) => {
+            match File::open(path) {
+                Err(e) => Err(Error::FailedConfigRead(e)),
+                Ok(mut file) => {
+                    let mut host = String::new();
+                    match file.read_to_string(&mut host) {
+                        Ok(_) => (),
+                        Err(e) => return Err(Error::FailedConfigRead(e)),
+                    }
+                    Ok(host.trim().to_string())
+                },
+            }
+        },
+    }
+}
+
 // Returns the XDG base dirs for slink
 fn xdg_dirs() -> Result<xdg::BaseDirectories, xdg::BaseDirectoriesError> {
     xdg::BaseDirectories::with_prefix("slink")
 }
 
-// Run an ssh command, given the host path and socket string
-fn ssh_command_with_host_path<F>(host_path: PathBuf, sock_str: &str, ssh_closure: F) -> SlinkResult<()>
-    where  F: FnOnce(&mut Command) -> ()
-{
-    match File::open(host_path) {
-        Ok(mut file) => {
-            let mut host = String::new();
-            match file.read_to_string(&mut host) {
-                Ok(_) => (),
-                Err(e) => return Err(Error::FailedConfigRead(e)),
-            }
-            ssh_command_with_host(host.as_str().trim(), sock_str, ssh_closure)
-        },
-        Err(e) => Err(Error::FailedConfigRead(e)),
-    }
-}
-
 // Run an ssh command, given the actual host and the socket string
-fn ssh_command_with_host<F>(host: &str, sock_str: &str, ssh_closure: F) -> SlinkResult<()>
+fn ssh_command_with_host<F>(host: &str, ssh_closure: F) -> SlinkResult<()>
     where  F: FnOnce(&mut Command) -> ()
 {
+    let dirs = xdg_dirs().unwrap();
+    let sock_filename = format!("conn-{}.sock", host);
+    let sock_path = dirs.place_cache_file(sock_filename)
+                        .expect("Could not create persistent socket file");
+    let sock_str = sock_path.to_str().unwrap();
+
     let proc_result = process::run("ssh", |cmd| {
         // "auto" ControlMaster setting means create a new connection if none
         // exists, and use the existing one if available

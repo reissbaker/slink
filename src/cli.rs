@@ -35,6 +35,9 @@ pub enum SlinkCommand {
         #[structopt(help = "Path to remote file", parse(from_os_str))]
         path: PathBuf,
     },
+
+    #[structopt(name = "current", about = "Print current remote hostname")]
+    Current,
 }
 
 #[derive(StructOpt, Debug)]
