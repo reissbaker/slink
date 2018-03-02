@@ -76,8 +76,8 @@ fn rsync_down() -> SlinkResult<()> {
 }
 
 fn upload(path: PathBuf) -> SlinkResult<()> {
-    println!("uploading: {:?}", path);
-    Ok(())
+    let to = paths::same_path().join(path.canonicalize().unwrap().as_path());
+    conn::scp_up(path, to)
 }
 
 fn download(path: PathBuf) -> SlinkResult<()> {

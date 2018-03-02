@@ -4,6 +4,7 @@ use std::fs::File;
 use std::io::Write;
 use std::io::Read;
 use std::vec::Vec;
+use std::path::PathBuf;
 use xdg;
 use isatty;
 use process;
@@ -30,10 +31,19 @@ pub enum Error {
 pub fn ssh_command<F>(ssh_closure: F) -> SlinkResult<()>
     where  F: FnOnce(&mut Command) -> ()
 {
-    let host_result = get_host();
-    match host_result {
+    match get_host() {
         Err(e) => Err(e),
         Ok(host) => ssh_command_with_host(host.as_str(), ssh_closure),
+    }
+}
+
+pub fn scp_up(from: PathBuf, to: PathBuf) -> SlinkResult<()> {
+    match get_host() {
+        Err(e) => Err(e),
+        Ok(host) => scp(host.as_str(), |cmd| {
+            cmd.arg(from.to_str().unwrap());
+            cmd.arg(format!("{}:{}", host, to.to_str().unwrap()));
+        }),
     }
 }
 
@@ -105,14 +115,6 @@ pub fn ssh_opts(host: &str) -> Vec<String> {
     // Hang onto the shared connection for 10mins after exit
     vec.push(String::from("-oControlPersist=10m"));
 
-    // Force PTY allocation for interactivity if stdout is a tty
-    if isatty::stdout_isatty() {
-        vec.push(String::from("-t"));
-    }
-
-    // Run in quiet mode
-    vec.push(String::from("-q"));
-
     vec
 }
 
@@ -123,10 +125,35 @@ fn ssh_command_with_host<F>(host: &str, ssh_closure: F) -> SlinkResult<()>
     let proc_result = process::run("ssh", |cmd| {
         // Insert the options
         cmd.args(ssh_opts(host));
+
+        // Force PTY allocation for interactivity if stdout is a tty
+        if isatty::stdout_isatty() {
+            cmd.arg("-t");
+        }
+
+        // Run in quiet mode
+        cmd.arg("-q");
+
         // And finally, SSH to the given host
         cmd.arg(host);
         // Allow further configuration via the passed-in closure
         ssh_closure(cmd);
+    });
+
+    match proc_result {
+        Ok(_) => Ok(()),
+        Err(err) => Err(Error::ProcessError(err)),
+    }
+}
+
+fn scp<F>(host: &str, closure: F) -> SlinkResult<()>
+    where  F: FnOnce(&mut Command) -> ()
+{
+    let proc_result = process::run("scp", |cmd| {
+        // Insert the options
+        cmd.args(ssh_opts(host));
+        // Allow further configuration via the passed-in closure
+        closure(cmd);
     });
 
     match proc_result {
