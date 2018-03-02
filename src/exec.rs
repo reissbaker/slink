@@ -13,7 +13,7 @@ pub fn command_in(path_buf: PathBuf, command: &str) -> String {
 
     // Escape the echo message separately, since otherwise you'd need to encase
     // in quotes (which would break shell escaping)
-    let echo_string = format!("Running in remote directory: {}", path);
+    let echo_string = format!("\x1B[1;32mRunning in remote directory:\x1B[0m {}", path);
     let escaped_echo = shell_escape::escape(Cow::Borrowed(echo_string.as_str()));
 
     format!(
