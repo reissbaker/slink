@@ -1,14 +1,25 @@
-## Slink: easily manage a linked remote machine over SSH.
+## Slink: simple remote development environments
+
+```bash
+slink use devbox.reissbaker.net
+
+# sync the current directory to the remote machine:
+slink sync up
+
+# Run a command on the remote machine in the synced directory:
+slink run ls
+
+# SSH into the machine and change to the synced directory:
+slink go
+```
 
 Slink is designed to make remote development environments simple and relatively
-painless. It's allows you to treat a remote machine as being a mirror of your
+painless. It allows you to treat a remote machine as being a mirror of your
 local machine; it syncs directories, keeping your directory structure the same,
-opens shells on the remote machine in the directories that mirror your PWD
-locally, etc. You can save your remote environment's hostname to disk to avoid
-having to type the extra keystrokes on every command, and it uses a single,
-multiplexed SSH connection for all of its commands for performance. It
-abstracts over SSH, rsync, and scp to provide a single interface for easily
-interacting with a remote dev environment.
+opens shells on the remote machine in the directories that mirror your PWD,
+etc. It abstracts over SSH, rsync, and scp to provide a simple interface for
+interacting with a remote dev environment, and multiplexes connections for all
+of them over a single cached SSH connection for performance.
 
 Slink assumes you want your remote machine to effectively mirror the directory
 structure of your local machine: the expectation is you're treating your remote
