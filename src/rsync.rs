@@ -11,9 +11,6 @@ pub fn up(to: PathBuf) -> SlinkResult<()> {
     };
 
     rsync(host.as_str(), |cmd| {
-        // Delete extraneous files
-        cmd.arg("--delete");
-
         // Use the current directory
         cmd.arg(".");
 
@@ -44,6 +41,9 @@ fn rsync<F>(host: &str, closure: F) -> SlinkResult<()>
         // archive mode: preserve most things, allows modification-based optimizations
         cmd.arg("-a");
         cmd.arg("-v");
+
+        // Delete extraneous files
+        cmd.arg("--delete");
 
         // use the persistent connection!
         cmd.arg("-e");
