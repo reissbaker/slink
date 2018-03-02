@@ -27,7 +27,7 @@ pub fn down(from: PathBuf) -> SlinkResult<()> {
 
     rsync(host.as_str(), |cmd| {
         // the host:dest string
-        cmd.arg(format!("{}:{}", host, from.to_str().unwrap()));
+        cmd.arg(format!("{}:{}/**", host, from.to_str().unwrap()));
 
         // write to the current directory
         cmd.arg(".");
