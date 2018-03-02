@@ -7,7 +7,7 @@ slink use devbox.reissbaker.net
 slink sync up
 
 # Run a command on the remote machine in the synced directory:
-slink run ls
+slink run "ls -la"
 
 # SSH into the machine and change to the synced directory:
 slink go
