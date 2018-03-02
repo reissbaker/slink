@@ -68,13 +68,11 @@ fn run(command: String) -> SlinkResult<()> {
 }
 
 fn rsync_up() -> SlinkResult<()> {
-    println!("hello from up");
     rsync::up(paths::same_path())
 }
 
 fn rsync_down() -> SlinkResult<()> {
-    println!("hello from down");
-    Ok(())
+    rsync::down(paths::same_path())
 }
 
 fn upload(path: PathBuf) -> SlinkResult<()> {
