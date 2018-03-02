@@ -1,7 +1,7 @@
 * [x] `sync up`
 * [x] `sync down`
 * [ ] .slink config directory, with an ignore file inside
-* [ ] `upload`
+* [x] `upload`
 * [ ] `download`
 * [ ] Allow up, down, upload, and download to take an optional second argument
   to allow uploading/downloading/syncing to specific directories that don't
