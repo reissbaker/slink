@@ -3,6 +3,7 @@ use std::process::Command;
 use std::fs::File;
 use std::io::Write;
 use std::io::Read;
+use std::vec::Vec;
 use xdg;
 use isatty;
 use process;
@@ -87,35 +88,43 @@ fn xdg_dirs() -> Result<xdg::BaseDirectories, xdg::BaseDirectoriesError> {
     xdg::BaseDirectories::with_prefix("slink")
 }
 
-// Run an ssh command, given the actual host and the socket string
-fn ssh_command_with_host<F>(host: &str, ssh_closure: F) -> SlinkResult<()>
-    where  F: FnOnce(&mut Command) -> ()
-{
+pub fn ssh_opts(host: &str) -> Vec<String> {
     let dirs = xdg_dirs().unwrap();
     let sock_filename = format!("conn-{}.sock", host);
     let sock_path = dirs.place_cache_file(sock_filename)
                         .expect("Could not create persistent socket file");
+
     let sock_str = sock_path.to_str().unwrap();
 
+    let mut vec = Vec::with_capacity(6);
+    // "auto" ControlMaster setting means create a new connection if none
+    // exists, and use the existing one if available
+    vec.push(String::from("-oControlMaster=auto"));
+    // Use the passed-in socket string for the controlmaster path
+    vec.push(format!("-oControlPath={}", sock_str));
+    // Hang onto the shared connection for 10mins after exit
+    vec.push(String::from("-oControlPersist=10m"));
+
+    // Force PTY allocation for interactivity if stdout is a tty
+    if isatty::stdout_isatty() {
+        vec.push(String::from("-t"));
+    }
+
+    // Run in quiet mode
+    vec.push(String::from("-q"));
+
+    vec
+}
+
+// Run an ssh command, given the actual host and the socket string
+fn ssh_command_with_host<F>(host: &str, ssh_closure: F) -> SlinkResult<()>
+    where  F: FnOnce(&mut Command) -> ()
+{
     let proc_result = process::run("ssh", |cmd| {
-        // "auto" ControlMaster setting means create a new connection if none
-        // exists, and use the existing one if available
-        cmd.arg("-oControlMaster=auto")
-           // Use the passed-in socket string for the controlmaster path
-           .arg(format!("-oControlPath={}", sock_str))
-           // Hang onto the shared connection for 10mins after exit
-           .arg("-oControlPersist=10m");
-
-        // Force PTY allocation for interactivity if stdout is a tty
-        if isatty::stdout_isatty() {
-           cmd.arg("-t");
-        }
-
-        // Run in quiet mode
-        cmd.arg("-q")
-           // And finally, SSH to the given host
-           .arg(host);
-
+        // Insert the options
+        cmd.args(ssh_opts(host));
+        // And finally, SSH to the given host
+        cmd.arg(host);
         // Allow further configuration via the passed-in closure
         ssh_closure(cmd);
     });

@@ -11,6 +11,7 @@ mod errors;
 mod process;
 mod paths;
 mod exec;
+mod rsync;
 
 use structopt::StructOpt;
 use std::path::PathBuf;
@@ -56,19 +57,19 @@ fn current() -> SlinkResult<()> {
 
 fn go() -> SlinkResult<()> {
     conn::ssh_command(|ssh| {
-        ssh.arg(exec::shell_in_same_path());
+        ssh.arg(exec::shell_in(paths::same_path()));
     })
 }
 
 fn run(command: String) -> SlinkResult<()> {
     conn::ssh_command(|ssh| {
-        ssh.arg(exec::command_in_same_path(command.as_str()));
+        ssh.arg(exec::command_in(paths::same_path(), command.as_str()));
     })
 }
 
 fn rsync_up() -> SlinkResult<()> {
     println!("hello from up");
-    Ok(())
+    rsync::up(paths::same_path())
 }
 
 fn rsync_down() -> SlinkResult<()> {
