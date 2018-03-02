@@ -12,3 +12,4 @@
 * [ ] `clear` should clear all host configuration and socket files
 * [x] `current` should print the current host
 * [ ] Integration test slink by running an `sshd` in a Docker container
+* [ ] Actually exit with correct exit codes rather than panicking
