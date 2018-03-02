@@ -43,6 +43,7 @@ like your local machine, but on [different hardware|a different OS|etc].
 
 * [x] `sync up`
 * [x] `sync down`
+* [ ] .slink config directory, with an ignore file inside
 * [ ] `upload`
 * [ ] `download`
 * [ ] Allow up, down, upload, and download to take an optional second argument
