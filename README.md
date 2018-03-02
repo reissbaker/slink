@@ -1,4 +1,4 @@
-## Slink: simple remote development environments
+## Slink: simple remote development environments over SSH
 
 ```bash
 slink use remote-devbox.mydomain.com
@@ -25,7 +25,7 @@ Slink assumes you want your remote machine to effectively mirror the directory
 structure of your local machine: the expectation is you're treating your remote
 like your local machine, but on [different hardware|a different OS|etc].
 
-### Commands
+## Commands
 
 * `slink use <hostname>`: set the hostname to use for commands.
 * `slink go`: SSH to the machine, switching to the mirror of PWD (if it
