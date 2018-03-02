@@ -30,8 +30,8 @@ like your local machine, but on [different hardware|a different OS|etc].
 
 ### TODO
 
-* [ ] `sync up`
-* [ ] `sync down`
+* [x] `sync up`
+* [x] `sync down`
 * [ ] `upload`
 * [ ] `download`
 * [ ] Allow up, down, upload, and download to take an optional second argument
@@ -42,4 +42,4 @@ like your local machine, but on [different hardware|a different OS|etc].
   line; to reset, just delete the last line
 * [ ] `clear` should clear all host configuration and socket files
 * [x] `current` should print the current host
-* Integration test slink by running an `sshd` in a Docker container
+* [ ] Integration test slink by running an `sshd` in a Docker container
