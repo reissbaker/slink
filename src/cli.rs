@@ -1,4 +1,5 @@
 use std::path::PathBuf;
+use std::vec::Vec;
 
 #[derive(StructOpt, Debug)]
 #[structopt(name = "slink", about = "Interact with remote machines over SSH")]
@@ -38,6 +39,12 @@ pub enum SlinkCommand {
 
     #[structopt(name = "current", about = "Print current remote hostname")]
     Current,
+
+    #[structopt(name = "forward", about = "Forward ports")]
+    Forward {
+        #[structopt(name = "PORTS", help = "Ports to forward")]
+        ports: Vec<String>,
+    },
 }
 
 #[derive(StructOpt, Debug)]

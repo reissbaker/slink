@@ -15,6 +15,7 @@ mod rsync;
 
 use structopt::StructOpt;
 use std::path::PathBuf;
+use std::vec::Vec;
 use cli::{SlinkCommand, RsyncDirection};
 use errors::SlinkResult;
 
@@ -24,6 +25,7 @@ fn main() {
         SlinkCommand::Current => current(),
         SlinkCommand::Go => go(),
         SlinkCommand::Run { command } => run(command),
+        SlinkCommand::Forward { ports } => forward(ports),
         SlinkCommand::Rsync { direction } => {
             match direction {
                 RsyncDirection::Up => rsync_up(),
@@ -65,6 +67,11 @@ fn run(command: String) -> SlinkResult<()> {
     conn::ssh_command(|ssh| {
         ssh.arg(exec::command_in(paths::same_path(), command.as_str()));
     })
+}
+
+fn forward(ports: Vec<String>) -> SlinkResult<()> {
+    println!("Forwarding {}", ports.join(" "));
+    Ok(())
 }
 
 fn rsync_up() -> SlinkResult<()> {
