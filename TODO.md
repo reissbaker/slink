@@ -3,7 +3,7 @@
 * [ ] .slink config directory, with an ignore file inside
 * [x] `upload`
 * [ ] `download`
-* [ ] `forward ...`
+* [x] `forward ...`
 * [ ] Allow up, down, upload, and download to take an optional second argument
   to allow uploading/downloading/syncing to specific directories that don't
   match pwd on the remote machine

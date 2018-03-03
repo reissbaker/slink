@@ -11,6 +11,10 @@ slink run "ls -la"
 
 # SSH into the machine and change to the synced directory:
 slink go
+
+# Forward ports 8080 and 4443 on your local machine to the same ports on your
+# remote machine:
+slink forward 8080 4443
 ```
 
 Slink is designed to make remote development environments simple and relatively
@@ -32,6 +36,8 @@ like your local machine, but on [different hardware|a different OS|etc].
   exists).
 * `slink run <command>`: runs a command on the machine. Automatically allocates
   a PTY for you to allow interactive commands to work corrrectly.
+* `slink forward <ports...>`: forward ports from your local machine to the same
+  ports on the remote machine.
 * `slink sync up`: sync the current directory to the remote machine via rsync,
   maintaining relative path from $HOME if in $HOME, or from root otherwise.
 * `slink sync down`: inverse of `sync up`.
