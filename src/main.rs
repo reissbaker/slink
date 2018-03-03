@@ -70,8 +70,9 @@ fn run(command: String) -> SlinkResult<()> {
 }
 
 fn forward(ports: Vec<String>) -> SlinkResult<()> {
-    println!("Forwarding {}", ports.join(" "));
-    Ok(())
+    println!("Forwarding {}", ports.join(", "));
+    println!("<Ctrl-C to exit>");
+    conn::port_forward(ports)
 }
 
 fn rsync_up() -> SlinkResult<()> {
