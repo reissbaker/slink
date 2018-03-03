@@ -15,6 +15,10 @@ slink go
 # Forward ports 8080 and 4443 on your local machine to the same ports on your
 # remote machine:
 slink forward 8080 4443
+
+# Forward port 80 on your local machine to 80 on the remote machine -- slink
+# will automatically prompt for sudo as necessary
+slink forward 80
 ```
 
 Slink is designed to make remote development environments simple and painless.
