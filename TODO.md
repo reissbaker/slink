@@ -1,6 +1,9 @@
 * [x] `sync up`
 * [x] `sync down`
 * [ ] .slink config directory, with an ignore file inside
+* [ ] also allow a `target` file inside the directory-specific .slink config
+  dir, to mirror a directory under a different path on the remote (or just to
+  force a stable path in general)
 * [x] `upload`
 * [ ] `download`
 * [x] `forward ...`

@@ -17,11 +17,11 @@ slink go
 slink forward 8080 4443
 ```
 
-Slink is designed to make remote development environments simple and relatively
-painless. It allows you to treat a remote machine as being a mirror of your
-local machine; it syncs directories, keeping your directory structure the same,
-opens shells on the remote machine in the directories that mirror your PWD,
-etc. It abstracts over SSH, rsync, and scp to provide a simple interface for
+Slink is designed to make remote development environments simple and painless.
+It allows you to treat a remote machine as being a mirror of your local
+machine; it syncs directories, keeping your directory structure the same, opens
+shells on the remote machine in the directories that mirror your PWD, etc. It
+abstracts over SSH, rsync, and scp to provide a simple interface for
 interacting with a remote dev environment, and multiplexes connections for all
 of them over a single cached SSH connection for performance.
 
