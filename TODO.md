@@ -5,7 +5,7 @@
   dir, to mirror a directory under a different path on the remote (or just to
   force a stable path in general)
 * [x] `upload`
-* [ ] `download`
+* [x] `download`
 * [x] `forward ...`
 * [ ] Allow up, down, upload, and download to take an optional second argument
   to allow uploading/downloading/syncing to specific directories that don't
