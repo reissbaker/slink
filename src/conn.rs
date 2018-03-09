@@ -31,65 +31,58 @@ pub enum Error {
 pub fn ssh_command<F>(ssh_closure: F) -> SlinkResult<()>
     where  F: FnOnce(&mut Command) -> ()
 {
-    match get_host() {
-        Err(e) => Err(e),
-        Ok(host) => ssh_command_with_host(host.as_str(), ssh_closure),
-    }
+    let host = try!(get_host());
+    ssh_command_with_host(host.as_str(), ssh_closure)
 }
 
 pub fn port_forward(ports: Vec<String>) -> SlinkResult<()> {
-    match get_host() {
-        Err(e) => Err(e),
-        Ok(host) => {
-            // Check for low ports, since those are privileged
-            let mut has_low_port = false;
-            let mut command = "ssh";
-            let mut port_forwards: Vec<String> = Vec::new();
-            for port in ports {
-                if port.parse::<i32>().unwrap() < 1024 {
-                    has_low_port = true;
-                    command = "sudo";
-                }
-                port_forwards.push("-L".to_string());
-                port_forwards.push(format!("{}:127.0.0.1:{}", port, port));
-            }
+    let host = try!(get_host());
 
-            let proc_result = process::run(command, |cmd| {
-                // If there's a low port, the command was just sudo. Actually
-                // invoke ssh now.
-                if has_low_port {
-                    cmd.arg("ssh");
-                }
-
-                // Insert the options
-                cmd.args(ssh_opts(host.as_str()));
-
-                // Disable shell
-                cmd.arg("-N");
-
-                // Set up port forwards
-                cmd.args(&port_forwards);
-
-                // Using the remote host
-                cmd.arg(host);
-            });
-
-            match proc_result {
-                Ok(_) => Ok(()),
-                Err(err) => Err(Error::ProcessError(err)),
-            }
+    // Check for low ports, since those are privileged
+    let mut has_low_port = false;
+    let mut command = "ssh";
+    let mut port_forwards: Vec<String> = Vec::new();
+    for port in ports {
+        if port.parse::<i32>().unwrap() < 1024 {
+            has_low_port = true;
+            command = "sudo";
         }
+        port_forwards.push("-L".to_string());
+        port_forwards.push(format!("{}:127.0.0.1:{}", port, port));
+    }
+
+    let proc_result = process::run(command, |cmd| {
+        // If there's a low port, the command was just sudo. Actually
+        // invoke ssh now.
+        if has_low_port {
+            cmd.arg("ssh");
+        }
+
+        // Insert the options
+        cmd.args(ssh_opts(host.as_str()));
+
+        // Disable shell
+        cmd.arg("-N");
+
+        // Set up port forwards
+        cmd.args(&port_forwards);
+
+        // Using the remote host
+        cmd.arg(host);
+    });
+
+    match proc_result {
+        Ok(_) => Ok(()),
+        Err(err) => Err(Error::ProcessError(err)),
     }
 }
 
 pub fn scp_up(from: PathBuf, to: PathBuf) -> SlinkResult<()> {
-    match get_host() {
-        Err(e) => Err(e),
-        Ok(host) => scp(host.as_str(), |cmd| {
-            cmd.arg(from.to_str().unwrap());
-            cmd.arg(format!("{}:{}", host, to.to_str().unwrap()));
-        }),
-    }
+    let host = try!(get_host());
+    scp(host.as_str(), |cmd| {
+        cmd.arg(from.to_str().unwrap());
+        cmd.arg(format!("{}:{}", host, to.to_str().unwrap()));
+    })
 }
 
 pub fn scp_down(from: PathBuf, to: PathBuf) -> SlinkResult<()> {

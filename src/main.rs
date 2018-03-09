@@ -48,13 +48,8 @@ fn use_host(host: String) -> SlinkResult<()> {
 }
 
 fn current() -> SlinkResult<()> {
-    match conn::get_host() {
-        Err(e) => Err(e),
-        Ok(host) => {
-            println!("{}", host);
-            Ok(())
-        },
-    }
+    println!("{}", try!(conn::get_host()));
+    Ok(())
 }
 
 fn go() -> SlinkResult<()> {
