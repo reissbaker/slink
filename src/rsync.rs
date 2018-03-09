@@ -5,10 +5,7 @@ use process;
 use conn;
 
 pub fn up(to: PathBuf) -> SlinkResult<()> {
-    let host = match conn::get_host() {
-        Ok(host) => host,
-        Err(e) => return Err(e),
-    };
+    let host = try!(conn::get_host());
 
     rsync(host.as_str(), |cmd| {
         // Use the current directory
@@ -20,10 +17,7 @@ pub fn up(to: PathBuf) -> SlinkResult<()> {
 }
 
 pub fn down(from: PathBuf) -> SlinkResult<()> {
-    let host = match conn::get_host() {
-        Ok(host) => host,
-        Err(e) => return Err(e),
-    };
+    let host = try!(conn::get_host());
 
     rsync(host.as_str(), |cmd| {
         // the host:dest string
@@ -53,8 +47,5 @@ fn rsync<F>(host: &str, closure: F) -> SlinkResult<()>
         closure(cmd);
     });
 
-    match result {
-        Ok(_) => Ok(()),
-        Err(e) => Err(conn::Error::ProcessError(e)),
-    }
+    result.map(|_| ()).map_err(|e| conn::Error::ProcessError(e))
 }
