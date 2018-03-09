@@ -1,4 +1,9 @@
 * [x] `sync up`
+* [ ] `--watch` flag for `sync up`. To keep the connection alive as long as
+  `--watch` is running, without needing to persist the connection forever even
+  once it stops running, in a separate thread have an empty shell open on the
+  remote. (Or check if SSH supports a do-nothing command that doesn't open a
+  shell, but keeps the connection active.)
 * [x] `sync down`
 * [ ] .slink config directory, with an ignore file inside
 * [ ] also allow a `target` file inside the directory-specific .slink config
