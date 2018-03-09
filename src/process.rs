@@ -19,15 +19,13 @@ pub fn run<'a, F>(cmd_str: &'a str, cmd_closure: F) -> Result<(), Error<'a>>
     cmd_closure(&mut command);
 
     // Run and handle errors
-    let mut child = match command.spawn() {
-        Ok(child) => child,
-        Err(_) => return Err(Error::FailedToLaunch(cmd_str)),
-    };
+    let mut child = try!(command.spawn().map_err(|_| {
+        Error::FailedToLaunch(cmd_str)
+    }));
 
-    let exit_status = match child.wait() {
-        Ok(status) => status,
-        Err(_) => return Err(Error::FailedToWait(cmd_str)),
-    };
+    let exit_status = try!(child.wait().map_err(|_| {
+        Error::FailedToWait(cmd_str)
+    }));
 
     if exit_status.success() {
         return Ok(());
