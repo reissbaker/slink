@@ -7,6 +7,8 @@
 * [x] `upload`
 * [x] `download`
 * [x] `forward ...`
+* [ ] Figure out how to safely canonicalize paths for download, where they
+  don't exist on the local system but do exist on the remote
 * [ ] Allow up, down, upload, and download to take an optional second argument
   to allow uploading/downloading/syncing to specific directories that don't
   match pwd on the remote machine
