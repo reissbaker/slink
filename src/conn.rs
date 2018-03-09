@@ -92,6 +92,14 @@ pub fn scp_up(from: PathBuf, to: PathBuf) -> SlinkResult<()> {
     }
 }
 
+pub fn scp_down(from: PathBuf, to: PathBuf) -> SlinkResult<()> {
+    let host = try!(get_host());
+    scp(host.as_str(), |cmd| {
+        cmd.arg(format!("{}:{}", host, from.to_str().unwrap()));
+        cmd.arg(to.to_str().unwrap());
+    })
+}
+
 /*
  * Set the host used for SSH connections.
  */

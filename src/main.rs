@@ -90,6 +90,6 @@ fn upload(path: PathBuf) -> SlinkResult<()> {
 }
 
 fn download(path: PathBuf) -> SlinkResult<()> {
-    println!("downloading: {:?}", path);
-    Ok(())
+    let from = paths::same_path().join(path.canonicalize().unwrap().as_path());
+    conn::scp_down(from, path)
 }
