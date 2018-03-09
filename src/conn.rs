@@ -71,10 +71,7 @@ pub fn port_forward(ports: Vec<String>) -> SlinkResult<()> {
         cmd.arg(host);
     });
 
-    match proc_result {
-        Ok(_) => Ok(()),
-        Err(err) => Err(Error::ProcessError(err)),
-    }
+    proc_result.map_err(|e| Error::ProcessError(e))
 }
 
 pub fn scp_up(from: PathBuf, to: PathBuf) -> SlinkResult<()> {
@@ -101,17 +98,15 @@ pub fn set_host(host: &str) -> SlinkResult<()> {
     let host_path = dirs.place_config_file(HOST_CONFIG_FILE)
                         .expect("Cannot create config file");
 
-    let config_file = File::create(host_path);
+    let mut file = try!(File::create(host_path).map_err(|e| {
+        Error::FailedConfigWrite(e)
+    }));
 
-    match config_file {
-        Ok(mut file) => {
-            match file.write(format!("{}\n", host).as_bytes()) {
-                Ok(_) => Ok(()),
-                Err(e) => Err(Error::FailedConfigWrite(e)),
-            }
-        },
-        Err(e) => Err(Error::FailedConfigWrite(e)),
-    }
+    try!(file.write(format!("{}\n", host).as_bytes()).map_err(|e| {
+        Error::FailedConfigWrite(e)
+    }));
+
+    Ok(())
 }
 
 /*
@@ -119,24 +114,20 @@ pub fn set_host(host: &str) -> SlinkResult<()> {
  */
 pub fn get_host() -> SlinkResult<String> {
     let dirs = xdg_dirs().unwrap();
-    let host_path = dirs.find_config_file(HOST_CONFIG_FILE);
+    let path = try!(
+        dirs.find_config_file(HOST_CONFIG_FILE).ok_or(Error::NoConfigFile)
+    );
 
-    match host_path {
-        None => Err(Error::NoConfigFile),
-        Some(path) => {
-            match File::open(path) {
-                Err(e) => Err(Error::FailedConfigRead(e)),
-                Ok(mut file) => {
-                    let mut host = String::new();
-                    match file.read_to_string(&mut host) {
-                        Ok(_) => (),
-                        Err(e) => return Err(Error::FailedConfigRead(e)),
-                    }
-                    Ok(host.trim().to_string())
-                },
-            }
-        },
-    }
+    let mut file = try!(File::open(path).map_err(|e| {
+        Error::FailedConfigRead(e)
+    }));
+
+    let mut host = String::new();
+    try!(file.read_to_string(&mut host).map_err(|e| {
+        Error::FailedConfigRead(e)
+    }));
+
+    Ok(host.trim().to_string())
 }
 
 // Returns the XDG base dirs for slink
@@ -186,10 +177,7 @@ fn ssh_command_with_host<F>(host: &str, ssh_closure: F) -> SlinkResult<()>
         ssh_closure(cmd);
     });
 
-    match proc_result {
-        Ok(_) => Ok(()),
-        Err(err) => Err(Error::ProcessError(err)),
-    }
+    proc_result.map_err(|e| Error::ProcessError(e))
 }
 
 fn scp<F>(host: &str, closure: F) -> SlinkResult<()>
@@ -202,8 +190,5 @@ fn scp<F>(host: &str, closure: F) -> SlinkResult<()>
         closure(cmd);
     });
 
-    match proc_result {
-        Ok(_) => Ok(()),
-        Err(err) => Err(Error::ProcessError(err)),
-    }
+    proc_result.map_err(|e| Error::ProcessError(e))
 }
