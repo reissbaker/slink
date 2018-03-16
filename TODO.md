@@ -44,3 +44,9 @@
   additional remotes that themselves are forwarded. This allows you to e.g. use
   a local `kubectl` to transport to a remote Kubernetes cluster that is
   inaccessible to the outside world by traversing through an SSH bastion.
+* [ ] Allow per-command remote defaults in the slink config files, so that you
+  can sync to one remote but e.g. run or go to another. This is useful if
+  you're syncing files to a remote host over SSH, and the files are
+  volume-mounted into containers run by a local Kubernetes cluster on the
+  remote; you'd want the files to go to the underlying host, but `go` and `run`
+  to jump into the containers.
