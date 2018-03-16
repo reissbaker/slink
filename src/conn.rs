@@ -177,7 +177,16 @@ fn ssh_command_with_host<F>(host: &str, ssh_closure: F) -> SlinkResult<()>
         ssh_closure(cmd);
     });
 
-    proc_result.map_err(|e| Error::ProcessError(e))
+    match proc_result {
+        Ok(_) => Ok(()),
+
+        // 130 is 128+2, aka SIGINT. This appears to be generated sometimes when
+        // you log out of the remote connection -- not sure why? But doesn't
+        // appear to be a fatal error.
+        Err(process::Error::NonZeroExit(_, 130)) => Ok(()),
+
+        Err(e) => Err(Error::ProcessError(e)),
+    }
 }
 
 fn scp<F>(host: &str, closure: F) -> SlinkResult<()>
