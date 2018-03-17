@@ -12,6 +12,7 @@ mod process;
 mod paths;
 mod exec;
 mod rsync;
+mod config;
 
 use structopt::StructOpt;
 use std::path::PathBuf;
@@ -44,11 +45,11 @@ fn main() {
 
 fn use_host(host: String) -> SlinkResult<()> {
     println!("Using host: {}", host);
-    conn::set_host(host.as_str())
+    config::set_host(host.as_str())
 }
 
 fn current() -> SlinkResult<()> {
-    println!("{}", try!(conn::get_host()));
+    println!("{}", try!(config::get_host()));
     Ok(())
 }
 

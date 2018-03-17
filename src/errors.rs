@@ -1,8 +1,27 @@
-use conn;
 use process;
+use config;
 
 pub type SlinkResult<T> = Result<T, SlinkError>;
-pub type SlinkError = conn::Error;
+pub enum SlinkError {
+    /*
+     * SSH errors are all static strings; make it easier for consumers to use these
+     * values by setting them to have the static lifetime
+     */
+    ProcessError(process::Error<'static>),
+    ConfigError(config::Error),
+}
+
+impl From<process::Error<'static>> for SlinkError {
+    fn from(e: process::Error<'static>) -> SlinkError {
+        SlinkError::ProcessError(e)
+    }
+}
+
+impl From<config::Error>for SlinkError {
+    fn from(e: config::Error) -> SlinkError {
+        SlinkError::ConfigError(e)
+    }
+}
 
 pub fn log_error_and_exit(err: SlinkError) {
     println!("Slink encountered a fatal error:");
@@ -11,7 +30,7 @@ pub fn log_error_and_exit(err: SlinkError) {
     // don't forget to have an exit (rather than trying to remember to always
     // call exit() in the match arms).
     let exit = match err {
-        conn::Error::ProcessError(proc_err) => {
+        SlinkError::ProcessError(proc_err) => {
             match proc_err {
                 process::Error::FailedToLaunch(name) => {
                     println!("Failed to launch {}", name);
@@ -34,19 +53,23 @@ pub fn log_error_and_exit(err: SlinkError) {
                 },
             }
         },
-        conn::Error::NoConfigFile => {
-            println!("No config file found; run slink use <host> to set up");
-            6
-        },
-        conn::Error::FailedConfigWrite(e) => {
-            println!("Failed to write config file with the following error:");
-            println!("{}", e);
-            7
-        },
-        conn::Error::FailedConfigRead(e) => {
-            println!("Failed to read config file with the following error:");
-            println!("{}", e);
-            8
+        SlinkError::ConfigError(e) => {
+            match e {
+                config::Error::NoConfigFile => {
+                    println!("No config file found; run slink use <host> to set up");
+                    6
+                },
+                config::Error::FailedConfigWrite(e) => {
+                    println!("Failed to write config file:");
+                    println!("{}", e);
+                    7
+                },
+                config::Error::FailedConfigRead(e) => {
+                    println!("Failed to read config file:");
+                    println!("{}", e);
+                    8
+                },
+            }
         },
     };
 

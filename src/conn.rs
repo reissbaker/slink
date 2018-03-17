@@ -1,28 +1,11 @@
-use std::io;
 use std::process::Command;
-use std::fs::File;
-use std::io::Write;
-use std::io::Read;
 use std::vec::Vec;
 use std::path::PathBuf;
-use xdg;
+use std::convert;
 use isatty;
 use process;
 use errors::SlinkResult;
-
-const HOST_CONFIG_FILE: &'static str = "hostname";
-
-pub enum Error {
-    NoConfigFile,
-    FailedConfigWrite(io::Error),
-    FailedConfigRead(io::Error),
-
-    /*
-     * SSH errors are all static strings; make it easier for consumers to use these
-     * values by setting them to have the static lifetime
-     */
-    ProcessError(process::Error<'static>),
-}
+use config::{get_host, xdg_dirs};
 
 /*
  * Run an ssh command, passing the command as an argument to a closure for extra
@@ -51,7 +34,7 @@ pub fn port_forward(ports: Vec<String>) -> SlinkResult<()> {
         port_forwards.push(format!("{}:127.0.0.1:{}", port, port));
     }
 
-    let proc_result = process::run(command, |cmd| {
+    try!(process::run(command, |cmd| {
         // If there's a low port, the command was just sudo. Actually
         // invoke ssh now.
         if has_low_port {
@@ -69,9 +52,9 @@ pub fn port_forward(ports: Vec<String>) -> SlinkResult<()> {
 
         // Using the remote host
         cmd.arg(host);
-    });
+    }));
 
-    proc_result.map_err(|e| Error::ProcessError(e))
+    Ok(())
 }
 
 pub fn scp_up(from: PathBuf, to: PathBuf) -> SlinkResult<()> {
@@ -88,51 +71,6 @@ pub fn scp_down(from: PathBuf, to: PathBuf) -> SlinkResult<()> {
         cmd.arg(format!("{}:{}", host, from.to_str().unwrap()));
         cmd.arg(to.to_str().unwrap());
     })
-}
-
-/*
- * Set the host used for SSH connections.
- */
-pub fn set_host(host: &str) -> SlinkResult<()> {
-    let dirs = xdg_dirs().unwrap();
-    let host_path = dirs.place_config_file(HOST_CONFIG_FILE)
-                        .expect("Cannot create config file");
-
-    let mut file = try!(File::create(host_path).map_err(|e| {
-        Error::FailedConfigWrite(e)
-    }));
-
-    try!(file.write(format!("{}\n", host).as_bytes()).map_err(|e| {
-        Error::FailedConfigWrite(e)
-    }));
-
-    Ok(())
-}
-
-/*
- * Get the host used for SSH connections.
- */
-pub fn get_host() -> SlinkResult<String> {
-    let dirs = xdg_dirs().unwrap();
-    let path = try!(
-        dirs.find_config_file(HOST_CONFIG_FILE).ok_or(Error::NoConfigFile)
-    );
-
-    let mut file = try!(File::open(path).map_err(|e| {
-        Error::FailedConfigRead(e)
-    }));
-
-    let mut host = String::new();
-    try!(file.read_to_string(&mut host).map_err(|e| {
-        Error::FailedConfigRead(e)
-    }));
-
-    Ok(host.trim().to_string())
-}
-
-// Returns the XDG base dirs for slink
-fn xdg_dirs() -> Result<xdg::BaseDirectories, xdg::BaseDirectoriesError> {
-    xdg::BaseDirectories::with_prefix("slink")
 }
 
 pub fn ssh_opts(host: &str) -> Vec<String> {
@@ -185,19 +123,19 @@ fn ssh_command_with_host<F>(host: &str, ssh_closure: F) -> SlinkResult<()>
         // appear to be a fatal error.
         Err(process::Error::NonZeroExit(_, 130)) => Ok(()),
 
-        Err(e) => Err(Error::ProcessError(e)),
+        Err(e) => Err(convert::From::from(e)),
     }
 }
 
 fn scp<F>(host: &str, closure: F) -> SlinkResult<()>
     where  F: FnOnce(&mut Command) -> ()
 {
-    let proc_result = process::run("scp", |cmd| {
+    try!(process::run("scp", |cmd| {
         // Insert the options
         cmd.args(ssh_opts(host));
         // Allow further configuration via the passed-in closure
         closure(cmd);
-    });
+    }));
 
-    proc_result.map_err(|e| Error::ProcessError(e))
+    Ok(())
 }

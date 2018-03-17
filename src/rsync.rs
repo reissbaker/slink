@@ -3,9 +3,10 @@ use std::path::PathBuf;
 use errors::SlinkResult;
 use process;
 use conn;
+use config;
 
 pub fn up(to: PathBuf) -> SlinkResult<()> {
-    let host = try!(conn::get_host());
+    let host = try!(config::get_host());
 
     rsync(host.as_str(), |cmd| {
         // Use the current directory
@@ -17,7 +18,7 @@ pub fn up(to: PathBuf) -> SlinkResult<()> {
 }
 
 pub fn down(from: PathBuf) -> SlinkResult<()> {
-    let host = try!(conn::get_host());
+    let host = try!(config::get_host());
 
     rsync(host.as_str(), |cmd| {
         // the host:dest string
@@ -31,7 +32,7 @@ pub fn down(from: PathBuf) -> SlinkResult<()> {
 fn rsync<F>(host: &str, closure: F) -> SlinkResult<()>
     where  F: FnOnce(&mut Command) -> ()
 {
-    let result = process::run("rsync", |cmd| {
+    try!(process::run("rsync", |cmd| {
         // archive mode: preserve most things, allows modification-based optimizations
         cmd.arg("-a");
         cmd.arg("-v");
@@ -45,7 +46,7 @@ fn rsync<F>(host: &str, closure: F) -> SlinkResult<()>
         cmd.arg(format!("ssh {}", ssh_opts_str));
 
         closure(cmd);
-    });
+    }));
 
-    result.map(|_| ()).map_err(|e| conn::Error::ProcessError(e))
+    Ok(())
 }
