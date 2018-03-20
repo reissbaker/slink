@@ -5,7 +5,7 @@
   remote. (Or check if SSH supports a do-nothing command that doesn't open a
   shell, but keeps the connection active.)
 * [x] `sync down`
-* [ ] .slink config directory, with an ignore file inside
+* [x] .slink config directory, with an ignore file inside
 * [ ] also allow a `target` file inside the directory-specific .slink config
   dir, to mirror a directory under a different path on the remote (or just to
   force a stable path in general)
