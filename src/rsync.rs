@@ -22,7 +22,10 @@ pub fn up(to: PathBuf) -> SlinkResult<()> {
             // an absolute path, figure out if it's a subdirectory of pwd, and
             // if so, pass the relative path to rsync's --exclude
             if ignore.starts_with("/") {
-                let maybe_rel_path = pathdiff::diff_paths(&PathBuf::from(ignore), &paths::pwd_or_panic());
+                let maybe_rel_path = pathdiff::diff_paths(
+                    &PathBuf::from(ignore),
+                    &paths::pwd_or_panic()
+                );
                 match maybe_rel_path {
                     None => (),
                     Some(rel_path) => {
