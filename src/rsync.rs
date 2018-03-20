@@ -16,7 +16,11 @@ pub fn up(to: PathBuf) -> SlinkResult<()> {
         // Use the current directory
         cmd.arg(".");
 
+        // Check all the ignores
         for ignore in ignored.iter() {
+            // rsync expects all file paths to be relative. If you're looking at
+            // an absolute path, figure out if it's a subdirectory of pwd, and
+            // if so, pass the relative path to rsync's --exclude
             if ignore.starts_with("/") {
                 let maybe_rel_path = pathdiff::diff_paths(&PathBuf::from(ignore), &paths::pwd_or_panic());
                 match maybe_rel_path {
@@ -28,6 +32,7 @@ pub fn up(to: PathBuf) -> SlinkResult<()> {
                     },
                 }
             }
+            // Otherwise if it's relative, just pass it straight through
             else {
                 ignore_path(cmd, PathBuf::from(ignore));
             }
