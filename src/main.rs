@@ -35,6 +35,7 @@ fn main() {
         },
         SlinkCommand::Upload { path } => upload(path),
         SlinkCommand::Download { path } => download(path),
+        SlinkCommand::Debug => debug(),
     };
 
     match result {
@@ -88,4 +89,10 @@ fn upload(path: PathBuf) -> SlinkResult<()> {
 fn download(path: PathBuf) -> SlinkResult<()> {
     let from = paths::same_path().join(path.as_path());
     conn::scp_down(from, path)
+}
+
+fn debug() -> SlinkResult<()> {
+    let ignored = config::ignored_files();
+    println!("ignored files: {:?}", ignored);
+    Ok(())
 }

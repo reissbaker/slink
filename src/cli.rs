@@ -45,6 +45,9 @@ pub enum SlinkCommand {
         #[structopt(name = "PORTS", help = "Ports to forward")]
         ports: Vec<String>,
     },
+
+    #[structopt(name = "debug", about = "Print various debug messages")]
+    Debug,
 }
 
 #[derive(StructOpt, Debug)]
