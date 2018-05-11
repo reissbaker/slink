@@ -7,6 +7,12 @@ description = "Simple remote dev environments over SSH"
 repository = "git://github.com:reissbaker/slink.git"
 license = "MIT"
 
+categories = [
+  "command-line-interface",
+  "command-line-utilities",
+  "development-tools",
+]
+
 [dependencies]
 serde = "1.0"
 serde_yaml = "0.7"
