@@ -3,6 +3,10 @@ name = "slink"
 version = "0.1.0"
 authors = ["Matt Baker <matthew.reiss.baker@gmail.com>"]
 
+description = "Simple remote dev environments over SSH"
+repository = "git://github.com:reissbaker/slink.git"
+license = "MIT"
+
 [dependencies]
 serde = "1.0"
 serde_yaml = "0.7"
