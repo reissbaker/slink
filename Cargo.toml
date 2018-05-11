@@ -4,7 +4,7 @@ version = "0.1.0"
 authors = ["Matt Baker <matthew.reiss.baker@gmail.com>"]
 
 description = "Simple remote dev environments over SSH"
-repository = "git://github.com:reissbaker/slink.git"
+repository = "https://github.com/reissbaker/slink"
 license = "MIT"
 
 categories = [
