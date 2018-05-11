@@ -1,6 +1,6 @@
 [package]
 name = "slink"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Matt Baker <matthew.reiss.baker@gmail.com>"]
 
 description = "Simple remote dev environments over SSH"
@@ -12,6 +12,8 @@ categories = [
   "command-line-utilities",
   "development-tools",
 ]
+
+readme = "README.md"
 
 [dependencies]
 serde = "1.0"
