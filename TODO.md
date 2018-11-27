@@ -12,6 +12,8 @@
 * [x] `upload`
 * [x] `download`
 * [x] `forward ...`
+* [x] `slink go` should accept an optional path. Mirror the local path if none
+  is provided by default.
 * [ ] Figure out how to safely canonicalize paths for download, where they
   don't exist on the local system but do exist on the remote
 * [ ] Allow up, down, upload, and download to take an optional second argument
@@ -19,7 +21,15 @@
   match pwd on the remote machine
 * [ ] `reset` should pop back up to last configuration. Implement this by
   changing the host config file to be multiples lines, and always use the last
-  line; to reset, just delete the last line
+  line; to reset, just delete the last line. Actually, possibly better idea: why
+  not use env vars? That way the original default is always restored after
+  you're done with a session, and changing config in one terminal session
+  doesn't affect other sessions you have open. Hmmm, this feels dangerous... If
+  you open a new terminal session to e.g. copy a file over when you already have
+  an interactive SSH connection running in your main session, you'll
+  accidentally copy to the wrong host. Instead, might be worth using env vars to
+  track the last used host for the current session, and if the current config
+  doesn't match the last used host, print a warning (if connected to TTY).
 * [ ] `clear` should clear all host configuration and socket files
 * [x] `current` should print the current host
 * [ ] Integration test slink by running an `sshd` in a Docker container

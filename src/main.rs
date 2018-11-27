@@ -24,7 +24,12 @@ fn main() {
     let result = match SlinkCommand::from_args() {
         SlinkCommand::Use { host } => use_host(host),
         SlinkCommand::Current => current(),
-        SlinkCommand::Go => go(),
+        SlinkCommand::Go { path } => {
+            match path {
+                Some(path) => go(path),
+                None => go(paths::same_path()),
+            }
+        }
         SlinkCommand::Run { command } => run(command),
         SlinkCommand::Forward { ports } => forward(ports),
         SlinkCommand::Rsync { direction } => {
@@ -54,9 +59,9 @@ fn current() -> SlinkResult<()> {
     Ok(())
 }
 
-fn go() -> SlinkResult<()> {
+fn go(path: PathBuf) -> SlinkResult<()> {
     conn::ssh_command(|ssh| {
-        ssh.arg(exec::shell_in(paths::same_path()));
+        ssh.arg(exec::shell_in(path));
     })
 }
 

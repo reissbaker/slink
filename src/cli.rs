@@ -11,7 +11,10 @@ pub enum SlinkCommand {
     },
 
     #[structopt(name = "go", about = "SSH to the remote")]
-    Go,
+    Go {
+        #[structopt(help = "The path to cd to on the remote; defaults to mirroring", parse(from_os_str))]
+        path: Option<PathBuf>,
+    },
 
     #[structopt(name = "run", about = "Run a command on the remote")]
     Run {
