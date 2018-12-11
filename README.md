@@ -55,9 +55,43 @@ To set a default host for Slink, edit your `.bashrc` (or `.zshrc`, or relevant
 file for your shell) to export the `SLINK_HOST` environment variable. From then
 on, all new shell sessions will use that host by default. For example:
 
-_Bash or Zsh:_
+__Bash or Zsh:__
 ```bash
+# In your .bashrc or .zshrc:
 export SLINK_HOST=remote-devbox.mydomain.com
+```
+
+__Fish:__
+```fish
+# In your config.fish
+set -x SLINK_HOST remote-devbox.mydomain.com
+```
+
+Within a single shell session, you can use the same syntax to change the
+default host for the rest of the shell session:
+
+__Bash or Zsh:__
+```bash
+# In any shell session:
+export SLINK_HOST=remote-devbox.mydomain.com
+```
+
+__Fish:__
+```fish
+# In any shell session:
+set -x SLINK_HOST remote-devbox.mydomain.com
+```
+
+Environment variables also make it easy to set a host for a single command:
+
+__Bash or Zsh:__
+```bash
+SLINK_HOST=other-devbox.mydomain.com slink go
+```
+
+__Fish:__
+```fish
+env SLINK_HOST=other-devbox.mydomain.com slink go
 ```
 
 In previous versions, Slink used a config file to store the current host. While
