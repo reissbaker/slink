@@ -11,6 +11,7 @@ use paths::relative_pwd;
 use xdg;
 
 const HOST_CONFIG_FILE: &'static str = "hostname";
+const HOST_ENV_VAR: &'static str = "SLINK_HOST";
 
 pub enum Error {
     NoConfigFile,
@@ -41,21 +42,26 @@ pub fn set_host(host: &str) -> SlinkResult<()> {
  * Get the host used for SSH connections.
  */
 pub fn get_host() -> SlinkResult<String> {
-    let dirs = xdg_dirs().unwrap();
-    let path = try!(
-        dirs.find_config_file(HOST_CONFIG_FILE).ok_or(Error::NoConfigFile)
-    );
+    match env::var(HOST_ENV_VAR) {
+        Ok(val) => Ok(val),
+        Err(_) => {
+            let dirs = xdg_dirs().unwrap();
+            let path = try!(
+                dirs.find_config_file(HOST_CONFIG_FILE).ok_or(Error::NoConfigFile)
+            );
 
-    let mut file = try!(File::open(path).map_err(|e| {
-        Error::FailedConfigRead(e)
-    }));
+            let mut file = try!(File::open(path).map_err(|e| {
+                Error::FailedConfigRead(e)
+            }));
 
-    let mut host = String::new();
-    try!(file.read_to_string(&mut host).map_err(|e| {
-        Error::FailedConfigRead(e)
-    }));
+            let mut host = String::new();
+            try!(file.read_to_string(&mut host).map_err(|e| {
+                Error::FailedConfigRead(e)
+            }));
 
-    Ok(host.trim().to_string())
+            Ok(host.trim().to_string())
+        }
+    }
 }
 
 // Returns the XDG base dirs for slink

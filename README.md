@@ -1,7 +1,7 @@
 ## Slink: simple remote development environments over SSH
 
 ```bash
-slink use remote-devbox.mydomain.com
+export SLINK_HOST=remote-devbox.mydomain.com
 
 # sync the current directory to the remote machine:
 slink sync up
@@ -48,3 +48,21 @@ like your local machine, but on [different hardware|a different OS|etc].
 * `slink upload <file>`: uploads a file to the remote, in the same relative
   location from $HOME if in $HOME, or from root otherwise.
 * `slink download <file>`: inverse of `upload`.
+
+## Host configuration
+
+To set a default host for Slink, edit your `.bashrc` (or `.zshrc`, or relevant
+file for your shell) to export the `SLINK_HOST` environment variable. From then
+on, all new shell sessions will use that host by default. For example:
+
+_Bash or Zsh:_
+```bash
+export SLINK_HOST=remote-devbox.mydomain.com
+```
+
+In previous versions, Slink used a config file to store the current host. While
+this made using a single machine as a remote very simple, it made managing
+multiple machines painful, especially if you were trying to manage them
+concurrently in multiple shell sessions, or were using Slink in automated
+wrapper scripts. Environment variables are just about as easy to set up, but
+make it simpler to manage multiple machines.
