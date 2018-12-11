@@ -1,6 +1,7 @@
 use std::env;
 use std::path::PathBuf;
 use pathdiff;
+use dirs;
 
 pub fn same_path() -> PathBuf {
     match relative_pwd() {
@@ -10,7 +11,7 @@ pub fn same_path() -> PathBuf {
 }
 
 pub fn relative_pwd() -> Option<PathBuf> {
-    env::home_dir().and_then(|home_dir| {
+    dirs::home_dir().and_then(|home_dir| {
         let pwd = pwd_or_panic();
         pathdiff::diff_paths(&pwd, &home_dir)
     })

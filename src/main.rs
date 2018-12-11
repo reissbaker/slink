@@ -4,6 +4,7 @@ extern crate xdg;
 extern crate pathdiff;
 extern crate shell_escape;
 extern crate isatty;
+extern crate dirs;
 
 mod cli;
 mod conn;

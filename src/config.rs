@@ -72,7 +72,7 @@ pub fn xdg_dirs() -> Result<xdg::BaseDirectories, xdg::BaseDirectoriesError> {
 pub fn ignored_files() -> HashSet<String> {
     let dirs = xdg_dirs().unwrap();
     let mut ignored: HashSet<String> = HashSet::new();
-    let home_dir = env::home_dir().unwrap();
+    let home_dir = dirs::home_dir().unwrap();
 
     match dirs.find_config_file("ignore") {
         Some(path) => read_ignore_file(home_dir.clone(), path, &mut ignored),
