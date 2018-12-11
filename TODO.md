@@ -19,17 +19,10 @@
 * [ ] Allow up, down, upload, and download to take an optional second argument
   to allow uploading/downloading/syncing to specific directories that don't
   match pwd on the remote machine
-* [ ] `reset` should pop back up to last configuration. Implement this by
-  changing the host config file to be multiples lines, and always use the last
-  line; to reset, just delete the last line. Actually, possibly better idea: why
-  not use env vars? That way the original default is always restored after
-  you're done with a session, and changing config in one terminal session
-  doesn't affect other sessions you have open. Hmmm, this feels dangerous... If
-  you open a new terminal session to e.g. copy a file over when you already have
-  an interactive SSH connection running in your main session, you'll
-  accidentally copy to the wrong host. Instead, might be worth using env vars to
-  track the last used host for the current session, and if the current config
-  doesn't match the last used host, print a warning (if connected to TTY).
+* [x] ~~`reset` should pop back up to last configuration.~~ Switched host
+  configuration to use environment variables, so you don't need a `reset`:
+  custom host configs are per-shell-session, and spawning a new shell sets you
+  back to whatever your default exported env var is.
 * [ ] `clear` should clear all host configuration and socket files
 * [x] `current` should print the current host
 * [ ] Integration test slink by running an `sshd` in a Docker container
