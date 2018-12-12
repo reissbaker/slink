@@ -46,8 +46,11 @@ like your local machine, but on [different hardware|a different OS|etc].
   maintaining relative path from $HOME if in $HOME, or from root otherwise.
 * `slink sync down`: inverse of `sync up`.
 * `slink upload <file>`: uploads a file to the remote, in the same relative
-  location from $HOME if in $HOME, or from root otherwise.
-* `slink download <file>`: inverse of `upload`.
+  location from $HOME if in $HOME, or from root otherwise. Also has an optional
+  `--to <file>` flag, to upload the local file to an arbitrary path on the
+  remote.
+* `slink download <file>`: inverse of `upload`. Has an optional `--from` flag,
+  to download the file from an arbitrary path on the remote.
 
 ## Host configuration
 
