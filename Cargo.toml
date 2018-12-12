@@ -1,7 +1,7 @@
 [package]
 name = "slink"
 version = "0.2.0"
-authors = ["Matt Baker <matthew.reiss.baker@gmail.com>"]
+authors = ["Matt Baker <@reissbaker>"]
 
 description = "Simple remote dev environments over SSH"
 repository = "https://github.com/reissbaker/slink"
