@@ -39,7 +39,7 @@ fn main() {
                 RsyncDirection::Down => rsync_down(),
             }
         },
-        SlinkCommand::Upload { path } => upload(path),
+        SlinkCommand::Upload { to, path } => upload(path, to),
         SlinkCommand::Download { path } => download(path),
         SlinkCommand::Debug => debug(),
     };
@@ -87,8 +87,15 @@ fn rsync_down() -> SlinkResult<()> {
     rsync::down(paths::same_path())
 }
 
-fn upload(path: PathBuf) -> SlinkResult<()> {
-    let to = paths::same_path().join(path.canonicalize().unwrap().as_path());
+fn upload(path: PathBuf, to: Option<String>) -> SlinkResult<()> {
+    let to = to.map(|string| {
+        let mut buf = PathBuf::new();
+        buf.push(string);
+        buf
+    }).unwrap_or_else(|| {
+        paths::same_path().join(path.canonicalize().unwrap().as_path())
+    });
+
     conn::scp_up(path, to)
 }
 

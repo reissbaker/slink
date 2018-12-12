@@ -30,6 +30,9 @@ pub enum SlinkCommand {
 
     #[structopt(name = "upload", about = "Upload a file to the remote")]
     Upload {
+        #[structopt(help = "Optional path on remote to upload to", short = "t", long = "to")]
+        to: Option<String>,
+
         #[structopt(help = "Path to local file", parse(from_os_str))]
         path: PathBuf,
     },

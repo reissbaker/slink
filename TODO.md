@@ -19,6 +19,10 @@
 * [ ] Allow up, down, upload, and download to take an optional second argument
   to allow uploading/downloading/syncing to specific directories that don't
   match pwd on the remote machine
+  * [ ] up
+  * [ ] down
+  * [x] upload
+  * [ ] download
 * [x] ~~`reset` should pop back up to last configuration.~~ Switched host
   configuration to use environment variables, so you don't need a `reset`:
   custom host configs are per-shell-session, and spawning a new shell sets you
