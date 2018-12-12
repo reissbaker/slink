@@ -40,7 +40,7 @@ fn main() {
             }
         },
         SlinkCommand::Upload { to, path } => upload(path, to),
-        SlinkCommand::Download { path } => download(path),
+        SlinkCommand::Download { from, path } => download(from, path),
         SlinkCommand::Debug => debug(),
     };
 
@@ -99,8 +99,15 @@ fn upload(path: PathBuf, to: Option<String>) -> SlinkResult<()> {
     conn::scp_up(path, to)
 }
 
-fn download(path: PathBuf) -> SlinkResult<()> {
-    let from = paths::same_path().join(path.as_path());
+fn download(from: Option<String>, path: PathBuf) -> SlinkResult<()> {
+    let from = from.map(|string| {
+        let mut buf = PathBuf::new();
+        buf.push(string);
+        buf
+    }).unwrap_or_else(|| {
+        paths::same_path().join(path.as_path())
+    });
+
     conn::scp_down(from, path)
 }
 

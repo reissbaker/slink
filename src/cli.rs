@@ -39,7 +39,10 @@ pub enum SlinkCommand {
 
     #[structopt(name = "download", about = "Download a file from the remote")]
     Download {
-        #[structopt(help = "Path to remote file", parse(from_os_str))]
+        #[structopt(help = "Optional path on remote to download from", short = "f", long = "from")]
+        from: Option<String>,
+
+        #[structopt(help = "Path to file", parse(from_os_str))]
         path: PathBuf,
     },
 
