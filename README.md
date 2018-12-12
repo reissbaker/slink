@@ -35,7 +35,6 @@ like your local machine, but on [different hardware|a different OS|etc].
 
 ## Commands
 
-* `slink use <hostname>`: set the hostname to use for commands.
 * `slink go`: SSH to the machine, switching to the mirror of PWD (if it
   exists).
 * `slink run <command>`: runs a command on the machine. Automatically allocates
